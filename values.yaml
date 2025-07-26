@@ -1,0 +1,15 @@
+topology:
+  nodePools:
+    pool1:
+      gpuProduct: NVIDIA-H100
+      gpuCount: 3
+      gpuMemory: 11441
+    pool2:
+      gpuProduct: NVIDIA-H100
+      gpuCount: 5
+      gpuMemory: 11441
+
+    pool3:
+      gpuProduct: NVIDIA-H100
+      gpuCount: 1
+      gpuMemory: 11441

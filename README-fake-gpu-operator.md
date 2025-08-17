@@ -1,4 +1,7 @@
-# Setup:
+# fake-gpu-operator
+
+## Objective
+Set up a local Kubernetes cluster and use fake-gpu-operator to simulate multiple gpus.
 
 ## Necessary tools
 [Minikube installation docs](https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Frpm+package)

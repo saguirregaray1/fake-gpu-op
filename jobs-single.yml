@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata: { name: job-a-3mig }
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: nvcr.io/nvidia/cuda:12.4.1-base-ubuntu22.04
+        command: ["/bin/bash","-lc","nvidia-smi && sleep 600"]
+        resources: { limits: { nvidia.com/gpu: 3 } }
+---
+apiVersion: batch/v1
+kind: Job
+metadata: { name: job-b-3mig }
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: nvcr.io/nvidia/cuda:12.4.1-base-ubuntu22.04
+        command: ["/bin/bash","-lc","nvidia-smi && sleep 600"]
+        resources: { limits: { nvidia.com/gpu: 3 } }
+---
+apiVersion: batch/v1
+kind: Job
+metadata: { name: job-c-1mig }
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: nvcr.io/nvidia/cuda:12.4.1-base-ubuntu22.04
+        command: ["/bin/bash","-lc","nvidia-smi && sleep 600"]
+        resources: { limits: { nvidia.com/gpu: 1 } }

@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-mig-config
+  namespace: gpu-operator
+data:
+  config.yaml: |
+    version: v1
+    mig-configs:
+      all-disabled:
+        - devices: all
+          mig-enabled: false
+
+      # Example mixes for H100 80GB
+      mix-3g40-4x1g10:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "3g.40gb": 1
+            "1g.10gb": 4
+
+      mix-2x2g20-3x1g10:   # you tested this successfully
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "2g.20gb": 2
+            "1g.10gb": 3
+
+      mix-4g40-3x1g10:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "4g.40gb": 1
+            "1g.10gb": 3

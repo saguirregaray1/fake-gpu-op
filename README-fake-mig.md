@@ -78,31 +78,12 @@ kubectl describe pod w1-1g
 kubectl describe pod w1-3g40
 ```
 
-After that, try running w2, which requires 4 GPUs and thus will be assigned to node 2
+## Re-configure the node
 
 ```bash
-kubectl apply -f w2.yml
+helm upgrade -i gpu-operator oci://ghcr.io/run-ai/fake-gpu-operator/fake-gpu-operator --namespace gpu-operator -f mig-alt-values.yaml
+kubectl -n gpu-operator delete cm -l node-topology=true
+kubectl -n gpu-operator rollout restart deploy/status-updater
 ```
 
-Use the same checks as before
-
-For w3, we ask for three gpus and use nodeSelector to choose node 3, which only has one.
-
-```bash
-kubectl apply -f w3.yml
-```
-
-You can see the error clearly running
-
-```bash
-kubectl describe pod w3
-```
-
-## Making sure that fake-gpu-operator is simulating properly
-
-Run gpu-test workload in order to make sure that the nodes do have nvidia-smi access.
-
-```bash
-kubectl apply -f gpu-test.yml
-```
 

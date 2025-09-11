@@ -1,7 +1,7 @@
-# Scaleway Mixed
+# Scaleway with NOS
 ## Objective
 Set up a local Kubernetes cluster on a Scaleway GPU instance with Minikube,
-and configure it to have a mixed configuration using GPU Operator
+and dynamically manage the mig-configuration using [NOS](https://github.com/nebuly-ai/nos)
 
 ## Steps
 
@@ -62,60 +62,55 @@ kubectl -n kube-system delete ds nvidia-device-plugin-daemonset --ignore-not-fou
 
 ```bash
 helm repo add nvidia https://helm.ngc.nvidia.com/nvidia && helm repo update
-helm upgrade --install gpu-operator nvidia/gpu-operator \
-  -n gpu-operator --create-namespace \
-  --set driver.enabled=false \
-  --set toolkit.enabled=true
+helm install --wait --generate-name \
+     -n gpu-operator --create-namespace \
+     nvidia/gpu-operator --version v22.9.0 \
+     --set driver.enabled=false \
+     --set migManager.enabled=false \
+     --set mig.strategy=mixed \
+     --set toolkit.enabled=true
 ```
 
-### Set MIG strategy to mixed
+### Install cert-manager
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
+```
+### Install NOS
 
 ```bash
-kubectl patch clusterpolicies.nvidia.com/cluster-policy --type='json' \
-  -p='[{"op":"replace","path":"/spec/mig/strategy","value":"mixed"}]'
+helm install oci://ghcr.io/nebuly-ai/helm-charts/nos \
+  --version 0.1.2 \
+  --namespace nebuly-nos \
+  --generate-name \
+  --create-namespace \
+  -f nos-values.yaml
 ```
 
-### Tell the operator to use this ConfigMap
-
-```bash
-kubectl patch clusterpolicies.nvidia.com/cluster-policy --type='json' \
-  -p='[{"op":"replace","path":"/spec/migManager/config/name","value":"custom-mig-config"}]'
-```
-
-### Apply the configuration
-```bash
-kubectl label node minikube nvidia.com/mig.config=mix-3g40-4x1g10 --overwrite
-```
-
-Wait until it finishes (should see `SUCCESS`)
-```bash
-kubectl get node minikube -L nvidia.com/mig.config -L nvidia.com/mig.config.state -w
-```
-
-Verify it worked
-```bash
-kubectl describe node
-```
-
-### Run a test job
-```bash
-kubectl apply -f jobs-mixed.yml
-```
+### Enable dynamic mig partitioning
 
 ```bash
-kubectl logs -f job/job-big-3g40
-kubectl logs -f job/job-small-1g10-a
-kubectl logs -f job/job-small-1g10-b
-kubectl logs -f job/job-small-1g10-c
-```
-You should see under MIG Devices the appropiate amount of memory for each job.
-
-### Applying another configuration
-```bash
-kubectl label node minikube nvidia.com/mig.config=mix-2x2g20-3x1g10 --overwrite
-kubectl get node minikube -L nvidia.com/mig.config -L nvidia.com/mig.config.state -w
+kubectl label nodes minikube "nos.nebuly.com/gpu-partitioning=mig"
 ```
 
+### Test dynamic mig partitioning
+
 ```bash
-kubectl describe node
+kubectl apply -f nos-1g.yml
 ```
+
+Since the algorithm is greedy, it will split the GPU in 7 1g10s.
+While its running, you can run
+
+```bash
+kubectl apply -f nos-3g.yml
+```
+
+And it will split the unused slices in order to accomodate this.
+
+You can see the logs for this in
+
+```bash
+kubectl -n nebuly-nos logs <mig-agent-name>
+```
+
+You can get mig-agent-name from running kubectl describe node and seeing the ones in the namespace.

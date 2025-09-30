@@ -5,8 +5,8 @@ Metaflow POC
 #### Install minikube
 
 ```bash
-curl -LO https://storage.googleapis.com/minikube-builds/20959/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 ```
 
 #### Install kubectl

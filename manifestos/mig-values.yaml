@@ -7,8 +7,10 @@ topology:
       otherDevices:
         - name: nvidia.com/mig-3g.40gb
           count: 1
+        - name: nvidia.com/mig-2g.20gb
+          count: 1
         - name: nvidia.com/mig-1g.10gb
-          count: 3
+          count: 2
   nodePoolLabelKey: run.ai/simulated-gpu-node-pool
   migStrategy: mixed
 

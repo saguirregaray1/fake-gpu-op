@@ -5,6 +5,38 @@ and dynamically manage the mig-configuration using [NOS](https://github.com/nebu
 
 ## Steps
 
+They gave us quota for Standard_NC24ads_A100_v4 on west us
+## Create the VM.
+
+### If you already have an image created use:
+```bash
+IMAGE_ID="/subscriptions/ff93c44e-caa6-4caf-856a-03e71711c699/resourceGroups/benchmark/providers/Microsoft.Compute/galleries/benchmark/images/benchmark/versions/latest"
+az vm create \
+  -g benchmark -n benchmark -l westus \
+  --image "$IMAGE_ID" \
+  --size Standard_NC24ads_A100_v4 \
+  --specialized \
+  --security-type TrustedLaunch \
+  --admin-username azureuser \
+  --ssh-key-name saguirregaray1 \
+  --public-ip-sku Standard \
+  --os-disk-size-gb 64
+```
+
+## If not
+
+```bash
+az vm create \
+  -g benchmark -n benchmark -l westus \
+  --image Canonical:ubuntu-24_04-lts:server:latest \
+  --size Standard_NC24ads_A100_v4 \
+  --admin-username azureuser \
+  --ssh-key-name saguirregaray1 \
+  --public-ip-sku Standard \
+  --os-disk-size-gb 64 \
+  --tags env=gpu os=ubuntu24.04
+```
+
 ### Install NVIDIA drivers
 
 ```bash
@@ -141,7 +173,13 @@ sudo systemctl restart docker
 ### Create the kubernetes cluster
 
 ```bash
-minikube start --driver=docker --container-runtime=docker --gpus nvidia.com --force
+minikube start -p custom-nos-test \
+--driver=docker \
+--container-runtime=docker  \
+--cpus=22 \
+--memory=200g  \
+--gpus nvidia.com  \
+--force
 ```
 
 ### Disable the default addon

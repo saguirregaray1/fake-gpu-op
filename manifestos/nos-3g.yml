@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bench
+spec:
+  containers:
+    - name: sleepy
+      image: ghcr.io/saguirregaray1/walkai/benchmark-prod:latest
+      resources:
+        limits:
+          nvidia.com/mig-3g.40gb: 1
+      volumeMounts:
+        - name: output
+          mountPath: /opt/output

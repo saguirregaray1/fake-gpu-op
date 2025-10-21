@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: w2
+spec:
+  containers:
+  - name: cuda-sleep
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+    command: ["sleep", "3600"]

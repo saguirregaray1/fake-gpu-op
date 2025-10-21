@@ -13,12 +13,7 @@ Set up a local Kubernetes cluster and use fake-gpu-operator to simulate multiple
 ## Spin up a single node minikube cluster
 
 ```bash
-  minikube start \
-    --driver=docker \
-    --nodes=1 \
-    --cpus=3 \
-    --memory=2g \
-    -p fake-mig-demo
+  minikube start --driver=docker -p fake-mig-demo
 ```
 
 Check that the nodes where created:
